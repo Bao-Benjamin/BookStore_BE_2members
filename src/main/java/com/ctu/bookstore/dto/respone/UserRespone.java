@@ -6,6 +6,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.Set;
+
 @Getter
 @Setter
 @Builder
@@ -27,4 +29,5 @@ public class UserRespone {
     @Email(message = "EMAIL_INVALID")
     String email;
     String adress;
+    Set<RoleRespone> roles;
 }

@@ -1,2 +1,6 @@
-package com.ctu.bookstore.enums;public enum Role {
+package com.ctu.bookstore.enums;
+
+public enum Role {
+    ADMIN,
+    USER
 }

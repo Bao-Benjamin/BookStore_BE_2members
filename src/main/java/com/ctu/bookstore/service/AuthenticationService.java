@@ -1,19 +1,155 @@
 package com.ctu.bookstore.service;
 
+import com.ctu.bookstore.configuration.CustomJwtDecoder;
 import com.ctu.bookstore.dto.request.AuthenticationRequest;
+import com.ctu.bookstore.dto.request.IntrospectRequest;
+import com.ctu.bookstore.dto.request.LogoutRequest;
+import com.ctu.bookstore.dto.respone.ApiRespone;
+import com.ctu.bookstore.dto.respone.AuthenticationRespone;
+import com.ctu.bookstore.dto.respone.IntrospectRespone;
+import com.ctu.bookstore.entity.InvalidatedToken;
 import com.ctu.bookstore.entity.User;
+import com.ctu.bookstore.enums.Role;
+import com.ctu.bookstore.exception.AppException;
+import com.ctu.bookstore.exception.ErrorCode;
+import com.ctu.bookstore.repository.InvalidatedTokenRepository;
 import com.ctu.bookstore.repository.UserRepository;
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.StringJoiner;
+import java.util.UUID;
+
+@Service
 public class AuthenticationService {
+    @Autowired
     private UserRepository userRepository;
-    private UserService userService;
 
-    public boolean checkLogin(AuthenticationRequest authenticationRequest){
-        User user = userRepository.findByUsername(authenticationRequest.getUsername());
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private InvalidatedTokenRepository invalidatedTokenRepository;
+
+
+    @Value("${jwt.signerKey}")
+    private String SIGNER_KEY;
+
+    public IntrospectRespone instrospect(IntrospectRequest request)
+            throws JOSEException, ParseException {
+       var token = request.getToken();
+
+       boolean isValid = true;
+       try {
+           verifyToken(token);
+       }catch (Exception e){
+           isValid = false;
+       }
+
+
+       return IntrospectRespone.builder()
+               .valid(isValid)
+               .build();
+    }
+    public AuthenticationRespone authenticate(AuthenticationRequest authenticationRequest){
+        var user = userRepository.findByUsername(authenticationRequest.getUsername())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         boolean result = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
-        return result;
+
+        String token = generateToken(user);
+
+        return AuthenticationRespone.builder()
+                .token(token)
+                .authenticated(result)
+                .build();
+    }
+
+    public void logout(LogoutRequest request) throws ParseException, JOSEException {
+        var signToken = verifyToken(request.getToken());
+
+        String jit = signToken.getJWTClaimsSet().getJWTID();
+        Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
+
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .id(jit)
+                .expiryTime(expiryTime)
+                .build();
+
+        invalidatedTokenRepository.save(invalidatedToken);
+    }
+    private String generateToken(User user){
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .issuer("BookStore_BE")
+                .subject(user.getUsername())
+                .issueTime(new Date())
+                .expirationTime(new Date(
+                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
+                .jwtID(UUID.randomUUID().toString())
+                .claim("scope",buildScope(user))
+                .build();
+
+        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+        JWSObject jwsObject = new JWSObject(header,payload);
+
+        try {
+            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+        } catch (JOSEException e) {
+            throw new RuntimeException(e);
+        }
+        return jwsObject.serialize();
+
+    }
+    private String buildScope(User user){
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        System.out.println("role của user trong buildScope "+user.getRoles());
+        if (!CollectionUtils.isEmpty(user.getRoles()))
+            user.getRoles().forEach(role -> {
+                stringJoiner.add("ROLE_" + role.getName());
+                if (!CollectionUtils.isEmpty(role.getPermissions()))
+                    role.getPermissions()
+                            .forEach(permission -> stringJoiner.add(permission.getName()));
+            });
+        System.out.println("stringJoiner của buildScope trong AuthenticationService "+stringJoiner);
+        return stringJoiner.toString();
+    }
+//private String buildScope(User user){
+//    StringJoiner stringJoiner = new StringJoiner(" ");
+//    if (!CollectionUtils.isEmpty(user.getRoles()))
+//        user.getRoles().forEach(stringJoiner::add);
+//
+//    return stringJoiner.toString();
+//}
+
+    private SignedJWT verifyToken(String token) throws JOSEException, ParseException {
+        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+
+        SignedJWT signedJWT = SignedJWT.parse(token);
+
+        Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        var verified = signedJWT.verify(verifier);
+
+        if (!(verified && expiryTime.after(new Date())))
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        if (invalidatedTokenRepository
+                .existsById(signedJWT.getJWTClaimsSet().getJWTID()))
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        return signedJWT;
     }
 }

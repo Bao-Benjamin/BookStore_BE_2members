@@ -1,4 +1,4 @@
-package com.ctu.bookstore.entity;
+package com.ctu.bookstore.entity.display;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -7,9 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.util.HashSet;
 import java.util.Set;
 
-//@Entity
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,11 +18,14 @@ import java.util.Set;
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    int id;
+    String id;
     String nameCategory;
+//    String slug;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     Category parentCategory;
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<Category> childCategory;
+    //mappedBy phải trùng tên field ManyToOne
+    @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<Category> childCategory = new HashSet<>();
+
 }

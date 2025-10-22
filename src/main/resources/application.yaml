@@ -14,4 +14,10 @@ spring:
       ddl-auto: update
     show-sql: true
 
+jwt:
+  signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
 
+cloudinary:
+  cloud-name: dfinfmcan
+  api-key: 113271311555791
+  api-secret: tYZLDGYk6imFOEq2IxDiFj_euXM

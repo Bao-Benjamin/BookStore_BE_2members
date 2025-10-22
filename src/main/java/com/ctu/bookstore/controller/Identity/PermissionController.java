@@ -1,4 +1,4 @@
-package com.ctu.bookstore.controller;
+package com.ctu.bookstore.controller.Identity;
 
 
 import com.ctu.bookstore.dto.request.PermissionRequest;

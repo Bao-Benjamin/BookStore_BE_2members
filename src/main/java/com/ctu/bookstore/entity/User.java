@@ -1,5 +1,6 @@
 package com.ctu.bookstore.entity;
 
+//import com.ctu.bookstore.entity.display.Cart;
 import com.ctu.bookstore.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,6 +30,8 @@ public class User {
     String avatar;
     String email;
     String adress;
+//    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    Cart cart;
     @ManyToMany
     Set<Role> roles;
 
