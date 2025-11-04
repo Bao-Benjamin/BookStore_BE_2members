@@ -15,5 +15,6 @@ public class ProductResponse {
     Double sellingPrice;
     Double salePrice;
     int quantity;
-    Set<ProductImages> imagesUrl;
+    Set<ProductImageResponse> imagesUrl;
+    Set<CommentResponse> comments;
 }

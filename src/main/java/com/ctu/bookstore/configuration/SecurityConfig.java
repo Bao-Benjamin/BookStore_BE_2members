@@ -52,7 +52,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/images/upload", "/products").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/images/upload", "/products", "/api/comments").permitAll()
                         .anyRequest().authenticated());
 
         httpSecurity.csrf(csrf -> csrf.disable());

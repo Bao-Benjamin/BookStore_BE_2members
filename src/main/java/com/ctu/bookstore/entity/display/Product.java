@@ -35,6 +35,8 @@ public class Product {
 
     // Helper method để quản lý mối quan hệ hai chiều
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<Comment> comments = new HashSet<>();
 
 
     // Helper method (giữ nguyên để đảm bảo mối quan hệ hai chiều)

@@ -1,8 +1,7 @@
-package com.ctu.bookstore.controller.Display;
+package com.ctu.bookstore.controller.display;
 
 import com.ctu.bookstore.service.display.ProductImagesService;
 import org.springframework.stereotype.Controller;
-import com.ctu.bookstore.entity.display.ProductImages;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
