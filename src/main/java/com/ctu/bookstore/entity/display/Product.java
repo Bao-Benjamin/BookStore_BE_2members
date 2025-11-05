@@ -35,8 +35,11 @@ public class Product {
 
     // Helper method để quản lý mối quan hệ hai chiều
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<Comment> comments = new HashSet<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<Comment> comments;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<Rating> ratings;
 
 
     // Helper method (giữ nguyên để đảm bảo mối quan hệ hai chiều)

@@ -5,6 +5,7 @@ import com.ctu.bookstore.dto.respone.display.CommentResponse;
 import com.ctu.bookstore.entity.User;
 import com.ctu.bookstore.entity.display.Comment;
 import com.ctu.bookstore.entity.display.Product;
+import com.ctu.bookstore.entity.display.Rating;
 import com.ctu.bookstore.mapper.display.CommentMapper;
 import com.ctu.bookstore.repository.UserRepository;
 import com.ctu.bookstore.repository.display.CommentRepository;
@@ -35,6 +36,15 @@ public class CommentService {
                 .product(product)
                 .createdAt(LocalDateTime.now())
                 .build();
+
+        // tạo rating kèm comment
+        Rating rating = Rating.builder()
+                .stars(request.getStars())
+                .comment(comment)
+                .product(product)
+                .build();
+
+        comment.setRating(rating);
 
         commentRepository.save(comment);
         return commentMapper.toCommentResponse(comment);

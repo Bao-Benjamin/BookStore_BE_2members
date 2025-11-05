@@ -23,6 +23,9 @@ public class Comment {
 
     LocalDateTime createdAt;
 
+    @OneToOne(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Rating rating;
+
     // Người bình luận
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -32,4 +35,6 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     Product product;
+
+
 }

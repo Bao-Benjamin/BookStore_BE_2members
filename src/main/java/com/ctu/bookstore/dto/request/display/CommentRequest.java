@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommentRequest {
-    String productId;
-    String content;
+    String content;      // Có thể null
+    int stars;           // Bắt buộc
+    String productId;    // Liên kết với sản phẩm
 }
