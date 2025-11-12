@@ -30,6 +30,10 @@ public class CommentService {
         User user = userRepository.findByUsername(username).orElseThrow();
         Product product = productRepository.findById(request.getProductId()).orElseThrow();
 
+        if (request.getStars() < 1 || request.getStars() > 5) {
+            throw new IllegalArgumentException("Rating stars must be between 1 and 5");
+        }
+
         Comment comment = Comment.builder()
                 .content(request.getContent())
                 .user(user)
