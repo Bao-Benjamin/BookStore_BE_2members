@@ -15,5 +15,6 @@ public class CommentResponse {
     String id;
     String content;
     String username;
+    int stars;
     LocalDateTime createdAt;
 }

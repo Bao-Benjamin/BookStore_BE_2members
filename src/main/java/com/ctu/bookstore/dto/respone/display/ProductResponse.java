@@ -16,5 +16,6 @@ public class ProductResponse {
     Double salePrice;
     int quantity;
     Set<ProductImageResponse> imagesUrl;
+    Double averageStars;
     Set<CommentResponse> comments;
 }
