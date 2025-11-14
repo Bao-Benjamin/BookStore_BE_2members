@@ -27,7 +27,7 @@ public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
             "/users","/user",
             "/auth/token", "/auth/introspect" ,"/auth/logout",
-            "/images/upload", "/products",
+            "/api/images/upload", "/api/products",
             "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"
 
     };
@@ -90,18 +90,7 @@ public class SecurityConfig {
 
         return http.build();
     }
-//    // Bean để cấu hình CORS
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(List.of("http://127.0.0.1:5500"));
-//        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-//        configuration.setAllowedHeaders(List.of("*"));
-//        configuration.setAllowCredentials(true);
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return source;
-//    }
+
     // Cho phép CORS từ các origin cần thiết
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
