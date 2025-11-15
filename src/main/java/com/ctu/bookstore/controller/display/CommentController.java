@@ -25,6 +25,7 @@ public class CommentController {
 
     @GetMapping("/{productId}")
     public ApiRespone<List<CommentResponse>> getComments(@PathVariable String productId) {
+        // gọi hàm builder(được tự tạo) có kiểu là generic vì nó nằm trong class generic
         return ApiRespone.<List<CommentResponse>>builder()
                 .result(commentService.getComments(productId))
                 .build();
