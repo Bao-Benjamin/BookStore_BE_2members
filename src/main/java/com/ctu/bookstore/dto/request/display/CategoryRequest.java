@@ -17,5 +17,5 @@ public class CategoryRequest {
     // ID của danh mục cha (Optional).
     // Nếu tạo danh mục con, người dùng/UI sẽ cung cấp ID này.
     private String parentId;
-    private Category children;
+
 }

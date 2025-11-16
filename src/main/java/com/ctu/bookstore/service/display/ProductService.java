@@ -2,9 +2,11 @@ package com.ctu.bookstore.service.display;
 
 import com.ctu.bookstore.dto.request.display.ProductRequest;
 import com.ctu.bookstore.dto.respone.display.ProductResponse;
+import com.ctu.bookstore.entity.display.Category;
 import com.ctu.bookstore.entity.display.Product;
 import com.ctu.bookstore.entity.display.ProductImages;
 import com.ctu.bookstore.mapper.display.ProductMapper;
+import com.ctu.bookstore.repository.display.CategoryRepository;
 import com.ctu.bookstore.repository.display.ProductImagesRepository;
 import com.ctu.bookstore.repository.display.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductMapper productMapper;
+    private final CategoryRepository categoryRepository;
     private final ProductImagesService productImagesService;
     private final ProductRepository productRepository;
     public Product create(ProductRequest request) throws IOException {
@@ -29,7 +32,11 @@ public class ProductService {
         if (product.getId() == null) {
             product.setId(UUID.randomUUID().toString());
         }
-
+        if (request.getCategoryId() != null) {
+            Category category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục với id: " + request.getCategoryId()));
+            product.setCategory(category);
+        }
         Set<ProductImages> imagesSet = new HashSet<>();
 
         if (request.getImages() != null) {
@@ -106,7 +113,11 @@ public class ProductService {
             product.setQuantity(request.getQuantity());
         }
 
-
+        if (request.getCategoryId() != null) {
+            Category category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục với id: " + request.getCategoryId()));
+            product.setCategory(category);
+        }
         if (request.getImages() != null) {
             // check xem trong list có file nào không rỗng không
             boolean hasRealImage = request.getImages().stream().anyMatch(img -> !img.isEmpty());

@@ -11,6 +11,8 @@ public interface ProductMapper {
     // Không cần gán ID thủ công trong Service nếu dùng @GeneratedValue/Builder/PrePersist trong Entity
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "imagesUrl", ignore = true)
+    @Mapping(target = "category", ignore = true)
     Product toProduct(ProductRequest request);
+    @Mapping(target = "categoryName", source = "category.nameCategory")
     ProductResponse toProductResponse(Product request);
 }

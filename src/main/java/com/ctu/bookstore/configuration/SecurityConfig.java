@@ -31,7 +31,9 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {"/users","/user",
-            "/auth/token", "/auth/introspect" ,"/auth/logout", "/images/upload", "/products"
+            "/auth/token", "/auth/introspect" ,"/auth/logout", "/images/upload",
+            "/products","/products/*","checkout/create-session","/carts/my-cart",
+            "/carts/size","user/infor"
 
     };
     @Value("${jwt.signerKey}")
@@ -48,11 +50,35 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,PUBLIC_ENDPOINTS).permitAll()
 //                        .requestMatchers(HttpMethod.GET, "/user").hasRole(Role.ADMIN.name())
                         .requestMatchers(
-                                "/v3/api-docs/**",
+//                                "/bookstore/v3/api-docs/**","/bookstore/v3/api-docs",
+//                                "/v3/api-docs",
+//                                "/v3/api-docs/**",
+//                                "/bookstore/swagger-ui/**",
+//                                "/bookstore/swagger-ui.html",
+//                                "/swagger-ui.html"
+                                "/bookstore/swagger-ui/**",
+                                "/bookstore/swagger-ui.html",
+                                "/bookstore/v3/api-docs/**",
+                                "/bookstore/v3/api-docs",
+                                "/bookstore/v3/api-docs/swagger-config",
+
+                                // fallback no context-path
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs",
+                                "/v3/api-docs/swagger-config",
+
+                                // static swagger resources
+                                "/swagger-ui/index.html",
+                                "/swagger-ui/swagger-ui.css",
+                                "/swagger-ui/swagger-ui-bundle.js",
+                                "/swagger-ui/swagger-ui-standalone-preset.js"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/images/upload", "/products").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/images/upload", "/products",
+                                "checkout/create-session","carts/item","/conversations/create",
+                                "/conversation/my-conversations","/messages/create","/messages/*",
+                                "/conversations/create-default").permitAll()
                         .anyRequest().authenticated());
 
         httpSecurity.csrf(csrf -> csrf.disable());
@@ -73,7 +99,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://127.0.0.1:5500"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

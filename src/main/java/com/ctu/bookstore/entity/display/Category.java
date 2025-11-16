@@ -1,5 +1,6 @@
 package com.ctu.bookstore.entity.display;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,7 @@ public class Category {
     Category parentCategory;
     //mappedBy phải trùng tên field ManyToOne
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // 🧠 Ngăn vòng lặp vô hạn khi trả JSON (nếu bạn có RestController)
     Set<Category> childCategory = new HashSet<>();
 
 }
