@@ -14,6 +14,16 @@ spring:
       ddl-auto: update
     show-sql: true
 
+  # ======================
+  # ELASTICSEARCH CONFIG
+  # ======================
+  elasticsearch:
+    uris: http://localhost:9200
+    connection-timeout: 5s
+    socket-timeout: 30s
+    username:              # để trống vì đã tắt security
+    password:
+
 jwt:
   signerKey: ${JWT_SIGNER_KEY}
 
@@ -21,3 +31,4 @@ cloudinary:
   cloud-name: ${CLOUD_NAME}
   api-key: ${CLOUD_API_KEY}
   api-secret: ${CLOUD_API_SECRET}
+

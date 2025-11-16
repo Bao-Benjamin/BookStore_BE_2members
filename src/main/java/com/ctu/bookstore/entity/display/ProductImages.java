@@ -1,6 +1,5 @@
 package com.ctu.bookstore.entity.display;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,9 +16,11 @@ public class ProductImages {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String Url;
+    String url;
+    // 🔥 Phải thêm field này để lưu public_id Cloudinary
+    String publicId;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id") // Đặt tên cột khóa ngoại trong DB
+    @JoinColumn(name = "product_id")
     @JsonIgnore
-    private Product product;
+    Product product;
 }

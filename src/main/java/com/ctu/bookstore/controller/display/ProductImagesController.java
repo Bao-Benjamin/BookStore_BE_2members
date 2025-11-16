@@ -1,8 +1,7 @@
 package com.ctu.bookstore.controller.display;
 
+import com.ctu.bookstore.entity.display.ProductImages;
 import com.ctu.bookstore.service.display.ProductImagesService;
-import org.springframework.stereotype.Controller;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +13,13 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/images")
 @RequiredArgsConstructor
-@Controller
 public class ProductImagesController {
-    private final ProductImagesService cloudinaryService;
 
+    private final ProductImagesService productImagesService;
+
+    /**
+     * API Upload ảnh
+     */
     @PostMapping("/upload")
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
@@ -25,22 +27,27 @@ public class ProductImagesController {
         }
 
         try {
-            String savedImage = cloudinaryService.uploadImage(file);
+            ProductImages savedImage = productImagesService.uploadImage(file);
             return new ResponseEntity<>(savedImage, HttpStatus.CREATED);
+
         } catch (IOException e) {
             e.printStackTrace();
-            return new ResponseEntity<>("Lỗi trong quá trình upload ảnh: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Lỗi upload ảnh: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * API xóa ảnh
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteImage(@PathVariable("id") String id) {
         try {
-            cloudinaryService.deleteImage(id);
+            productImagesService.deleteImage(id);
             return new ResponseEntity<>("Xóa ảnh thành công!", HttpStatus.OK);
+
         } catch (IOException e) {
             e.printStackTrace();
-            return new ResponseEntity<>("Lỗi trong quá trình xóa ảnh: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Lỗi khi xóa ảnh: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

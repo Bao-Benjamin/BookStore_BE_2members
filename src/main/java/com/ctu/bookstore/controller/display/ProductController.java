@@ -63,4 +63,15 @@ public class ProductController {
                 .result(updatedProduct)
                 .build();
     }
+
+    @DeleteMapping("/{id}")
+    public ApiRespone<String> deleteProduct(@PathVariable String id) {
+
+        productService.delete(id);
+
+        return ApiRespone.<String>builder()
+                .result("Xóa sản phẩm thành công: " + id)
+                .build();
+    }
+
 }

@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class ProductImageResponse {
-    String id;
-    String Url;
+    private String id;
+    private String url;
 }
