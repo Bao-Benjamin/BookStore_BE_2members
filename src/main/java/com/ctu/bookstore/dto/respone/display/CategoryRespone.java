@@ -18,5 +18,5 @@ public class CategoryRespone {
     private String parentName ; // Giúp UI hiển thị dễ dàng
 
     // Danh sách các danh mục con (giúp xây dựng cấu trúc cây/lồng nhau)
-    private Set<CategoryRespone> children ;
+    private Set<CategoryRespone> children = new HashSet<>();
 }

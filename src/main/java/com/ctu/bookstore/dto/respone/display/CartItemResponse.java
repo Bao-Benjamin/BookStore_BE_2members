@@ -1,8 +1,13 @@
 package com.ctu.bookstore.dto.respone.display;
 
+import lombok.*;
+
+@Getter
+@Setter
+
 public class CartItemResponse {
-    Long id;
+    String id;
     ProductResponse product; // Dùng lại ProductResponse
-    int quantity;
+    int quatity;
     Double subtotal; // priceAtTime * quantity
 }

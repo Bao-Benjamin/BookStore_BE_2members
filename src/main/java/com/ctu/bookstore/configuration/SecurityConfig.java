@@ -67,20 +67,45 @@ public class SecurityConfig {
 //    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // ✅ Cấu hình CORS phải khai báo trước authorizeHttpRequests
-        http.cors(Customizer.withDefaults());
 
-        // ✅ Tắt CSRF vì đang dùng API REST
+        http.cors(Customizer.withDefaults());
         http.csrf(csrf -> csrf.disable());
 
-        // ✅ Cấu hình phân quyền
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // cho phép preflight request
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS).permitAll()
+
+                // SWAGGER
+                .requestMatchers(
+                        "/bookstore/swagger-ui/**",
+                        "/bookstore/swagger-ui.html",
+                        "/bookstore/v3/api-docs/**",
+                        "/bookstore/v3/api-docs",
+                        "/bookstore/v3/api-docs/swagger-config",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/v3/api-docs",
+                        "/v3/api-docs/swagger-config",
+                        "/swagger-ui/index.html",
+                        "/swagger-ui/swagger-ui.css",
+                        "/swagger-ui/swagger-ui-bundle.js",
+                        "/swagger-ui/swagger-ui-standalone-preset.js"
+                ).permitAll()
+
+                .requestMatchers(HttpMethod.POST,
+                        "/images/upload", "/products",
+                        "checkout/create-session", "carts/item",
+                        "/conversations/create", "/conversation/my-conversations",
+                        "/messages/create", "/messages/*",
+                        "/conversations/create-default"
+                ).permitAll()
+
                 .anyRequest().authenticated()
         );
 
-        // ✅ Cấu hình JWT
         http.oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt
                         .decoder(customJwtDecoder)
@@ -90,6 +115,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     // Cho phép CORS từ các origin cần thiết
     @Bean

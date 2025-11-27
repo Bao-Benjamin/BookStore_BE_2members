@@ -15,7 +15,10 @@ public class ProductResponse {
     Double sellingPrice;
     Double salePrice;
     int quantity;
-    Set<ProductImageResponse> imagesUrl;
+    String description;
+    String author;
+    String categoryName;
+    Set<ProductImages> imagesUrl;
     Double averageStars;
     Set<CommentResponse> comments;
 }

@@ -3,9 +3,12 @@ package com.ctu.bookstore.service.display;
 import com.ctu.bookstore.dto.request.display.ProductRequest;
 import com.ctu.bookstore.dto.respone.display.ProductResponse;
 import com.ctu.bookstore.elasticsearch.ProductSearchService;
+import com.ctu.bookstore.entity.display.Category;
 import com.ctu.bookstore.entity.display.Product;
 import com.ctu.bookstore.entity.display.ProductImages;
 import com.ctu.bookstore.mapper.display.ProductMapper;
+import com.ctu.bookstore.repository.display.CategoryRepository;
+import com.ctu.bookstore.repository.display.ProductImagesRepository;
 import com.ctu.bookstore.repository.display.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import java.util.UUID;
 public class ProductService {
 
     private final ProductMapper productMapper;
+    private final CategoryRepository categoryRepository;
     private final ProductImagesService productImagesService;
     private final ProductRepository productRepository;
     private final ProductSearchService productSearchService;
@@ -36,7 +40,11 @@ public class ProductService {
         if (product.getId() == null) {
             product.setId(UUID.randomUUID().toString());
         }
-
+        if (request.getCategoryId() != null) {
+            Category category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục với id: " + request.getCategoryId()));
+            product.setCategory(category);
+        }
         Set<ProductImages> imagesSet = new HashSet<>();
 
         if (request.getImages() != null) {
@@ -53,7 +61,9 @@ public class ProductService {
                         imagesSet.add(image);
 
                     } catch (IOException e) {
+                        // Xử lý lỗi upload ảnh cụ thể, tránh dừng toàn bộ quá trình
                         System.err.println("Lỗi upload ảnh: " + e.getMessage());
+                        // Có thể throw lại RuntimeException hoặc log lỗi và tiếp tục
                     }
                 }
             }
@@ -85,6 +95,7 @@ public class ProductService {
     public ProductResponse findById(String id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với id: " + id));
+
         return productMapper.toProductResponse(product);
     }
 
@@ -100,17 +111,29 @@ public class ProductService {
         if (request.getNameProduct() != null && !request.getNameProduct().isBlank()) {
             product.setNameProduct(request.getNameProduct());
         }
+
         if (request.getImportPrice() != null) {
             product.setImportPrice(request.getImportPrice());
         }
+
         if (request.getSellingPrice() != null) {
             product.setSellingPrice(request.getSellingPrice());
         }
+
         if (request.getSalePrice() != null) {
             product.setSalePrice(request.getSalePrice());
         }
+
+        // quantity là kiểu nguyên, mặc định = 0 nếu người dùng không gửi →
+        // ta cần phân biệt xem người dùng có gửi thật hay không.
+        // Cách đơn giản nhất: đổi kiểu quantity trong ProductRequest thành `Integer` thay vì `int`
         if (request.getQuantity() != 0) {
             product.setQuantity(request.getQuantity());
+        }
+        if (request.getCategoryId() != null) {
+            Category category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục với id: " + request.getCategoryId()));
+            product.setCategory(category);
         }
 
         // xử lý upload ảnh mới

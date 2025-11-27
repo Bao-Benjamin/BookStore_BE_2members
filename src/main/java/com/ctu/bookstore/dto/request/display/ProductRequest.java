@@ -16,5 +16,8 @@ public class ProductRequest {
     Double sellingPrice;
     Double salePrice;
     int quantity;
+    String description;
+    String author;
+    String categoryId;
     List<MultipartFile> images;
 }
