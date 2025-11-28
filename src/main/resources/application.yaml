@@ -1,7 +1,7 @@
 server:
   port: ${SERVER_PORT}
   servlet:
-    context-path: /bookstore
+    context-path: ${SERVER_CONTEXT_PATH}
 
 spring:
   datasource:

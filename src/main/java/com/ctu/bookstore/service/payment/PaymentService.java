@@ -107,6 +107,7 @@ public class PaymentService {
                     .product(item.getProduct())
                     .quantity(item.getProduct().getQuantity())
                     .priceAtTime(item.getProduct().getSellingPrice())
+                    .ableComment(true)
                     .build();
             newOrder.getOrderItems().add(orderItem);
         }

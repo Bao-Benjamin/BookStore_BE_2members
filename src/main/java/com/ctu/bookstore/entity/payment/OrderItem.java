@@ -3,10 +3,7 @@ package com.ctu.bookstore.entity.payment;
 import com.ctu.bookstore.entity.display.Product;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
@@ -14,6 +11,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +26,6 @@ public class OrderItem {
     Product product;
     int quantity;
     double priceAtTime;
-
-
+    @Column(name = "able_comment", nullable = false)
+    private boolean ableComment = true;
 }
