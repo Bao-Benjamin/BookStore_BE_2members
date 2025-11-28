@@ -8,11 +8,11 @@ import lombok.experimental.FieldDefaults;
 
 @Entity
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@Getter
+@Getter //recommend using @Getter and @Setter cho entity(google for more). One reason is it easy to manage
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

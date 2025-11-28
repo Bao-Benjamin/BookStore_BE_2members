@@ -1,15 +1,14 @@
 package com.ctu.bookstore.dto.request.chat;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChatMessageRequest {
     @NotBlank
     String conversationId;

@@ -6,9 +6,9 @@ import lombok.experimental.FieldDefaults;
 import java.util.Set;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoleRequest {
     String name;

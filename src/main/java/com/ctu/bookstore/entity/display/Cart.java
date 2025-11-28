@@ -8,13 +8,14 @@ import lombok.experimental.FieldDefaults;
 import java.util.List;
 import java.util.Set;
 
+
 @Entity
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@Getter
+@Getter //recommend using @Getter and @Setter cho entity(google for more). One reason is it easy to manage
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

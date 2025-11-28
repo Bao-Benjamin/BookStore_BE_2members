@@ -1,17 +1,17 @@
 package com.ctu.bookstore.dto.respone.chat;
 
 import com.ctu.bookstore.entity.chat.ParticipantInfo;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
 import java.util.List;
 
 @Data
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ConversationResponse {
     String id;
     String type;

@@ -1,10 +1,12 @@
 package com.ctu.bookstore.entity.payment;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
+@Getter //recommend using @Getter and @Setter cho entity(google for more). One reason is it easy to manage
+@Setter
 @Builder
-@Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CheckoutRespone {
     String stripeCheckoutUrl;
 }

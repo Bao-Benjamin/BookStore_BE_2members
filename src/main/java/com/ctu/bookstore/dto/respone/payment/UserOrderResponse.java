@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@Getter
-@Setter
+
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserOrderResponse {
 
     User user;

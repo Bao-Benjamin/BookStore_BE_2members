@@ -10,13 +10,14 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+
 @Entity
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@Getter
+@Getter //recommend using @Getter and @Setter cho entity(google for more). One reason is it easy to manage
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

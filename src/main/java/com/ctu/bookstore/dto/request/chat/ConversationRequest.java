@@ -12,8 +12,8 @@ import lombok.experimental.FieldDefaults;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ConversationRequest {
     String type;

@@ -2,17 +2,15 @@ package com.ctu.bookstore.entity.display;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter //recommend using @Getter and @Setter cho entity(google for more). One reason is it easy to manage
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
