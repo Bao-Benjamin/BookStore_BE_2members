@@ -9,7 +9,6 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL) // để ẩn các trường có giá trị null của json
 public class ApiRespone<T> {
     @Builder.Default

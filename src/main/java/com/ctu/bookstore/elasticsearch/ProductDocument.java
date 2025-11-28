@@ -1,21 +1,25 @@
 package com.ctu.bookstore.elasticsearch;
 
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 @Document(indexName = "products")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductDocument {
 
     @Id
-    private String id;
+    String id;
 
-    private String nameProduct;
+    String nameProduct;
 
-    private Double sellingPrice;
+    Double sellingPrice;
 
-    private Double averageStars;
+    Double averageStars;
 }

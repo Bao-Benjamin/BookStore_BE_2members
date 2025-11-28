@@ -5,10 +5,11 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChatMessageRespone {
     String id;

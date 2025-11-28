@@ -11,13 +11,13 @@ import lombok.experimental.FieldDefaults;
 import java.time.LocalDate;
 import java.util.Set;
 
-@Getter
+@Entity
+@Getter //recommend using @Getter and @Setter cho entity(google for more). One reason is it easy to manage
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Entity
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

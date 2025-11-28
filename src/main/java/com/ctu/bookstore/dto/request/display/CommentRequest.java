@@ -3,8 +3,7 @@ package com.ctu.bookstore.dto.request.display;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
