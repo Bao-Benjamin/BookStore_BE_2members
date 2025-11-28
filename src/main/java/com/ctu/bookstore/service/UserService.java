@@ -5,6 +5,7 @@ import com.ctu.bookstore.dto.request.UserUpdateRequest;
 import com.ctu.bookstore.dto.respone.UserRespone;
 import com.ctu.bookstore.entity.User;
 //import com.ctu.bookstore.entity.Role;
+import com.ctu.bookstore.entity.payment.InforCheckout;
 import com.ctu.bookstore.enums.Role;
 import com.ctu.bookstore.exception.AppException;
 import com.ctu.bookstore.exception.ErrorCode;
@@ -53,7 +54,15 @@ public class UserService {
         System.out.println("Password SAU ENCODE: " + user.getPassword());
         HashSet<String> roles = new HashSet<>();
         roles.add(Role.USER.name());
-
+        InforCheckout inforCheckout = InforCheckout.builder()
+                .name(user.getLastname()+ user.getFirstname())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .adress(user.getAdress())
+                .voucher("bạn chưa nhập voucher")
+                .note("bạn chưa có ghi chú cho đơn hàng")
+                .build();
+        user.setInforCheckout(inforCheckout);
 //        user.setRoles(roles);
 
        return  userMapper.toUserRespone(userRepository.save(user));
@@ -75,18 +84,69 @@ public class UserService {
         SecurityContextHolder securityContextHolder = new SecurityContextHolder();
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
-        User user = userRepository.findByUsername(name).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
+        String n = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println("name trong user service " + n);
+        User user = userRepository.findByUsername(n).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
+        System.out.println("id user trong user service " + user.getId());
         return userMapper.toUserRespone(user);
     }
-    public UserRespone updateUser(String id, UserUpdateRequest userUpdateRequest){
+    public InforCheckout getInforCheckout(){
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(name).orElseThrow(()-> new RuntimeException("Không tìm được user trong user service"));
+        return user.getInforCheckout();
+    }
+    public UserRespone updateUser(String id, UserUpdateRequest req){
+
          User user = userRepository.findById(id)
                  .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-         userMapper.updateUser(user,userUpdateRequest);
+        InforCheckout inforCheckout = user.getInforCheckout();
+        if (req.getUsername() != null)
+            user.setUsername(req.getUsername());
 
-         user.setPassword(passwordEncoder.encode(userUpdateRequest.getPassword()));
 
-         var roles = roleRepository.findAllById(userUpdateRequest.getRoles());
-         user.setRoles(new HashSet<>(roles));
+        if (req.getFirstname() != null)
+            user.setFirstname(req.getFirstname());
+
+        if (req.getLastname() != null)
+            user.setLastname(req.getLastname());
+
+        if (req.getFirstname() != null && req.getLastname() != null)
+            inforCheckout.setName(req.getLastname() + req.getFirstname());
+        if (req.getGender() != null)
+            user.setGender(req.getGender());
+
+        if (req.getDob() != null)
+            user.setDob(req.getDob());
+        if (req.getPhoneNumber() != null)
+            user.setPhoneNumber(req.getPhoneNumber());
+            inforCheckout.setPhoneNumber((req.getPhoneNumber()));
+
+        if (req.getAvatar() != null)
+            user.setAvatar(req.getAvatar());
+
+        if (req.getEmail() != null)
+            user.setEmail(req.getEmail());
+            inforCheckout.setEmail(req.getEmail());
+
+        if (req.getAdress() != null)
+            user.setAdress(req.getAdress());
+            inforCheckout.setAdress(req.getAdress());
+//        userMapper.updateUser(user,req);
+
+//         user.setPassword(passwordEncoder.encode(userUpdateRequest.getPassword()));
+
+        // Password chỉ update nếu không null
+        if (req.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(req.getPassword()));
+        }
+//         var roles = roleRepository.findAllById(userUpdateRequest.getRoles());
+        // Roles cũng vậy
+        if (req.getRoles() != null) {
+            var roles = roleRepository.findAllById(req.getRoles());
+            user.setRoles(new HashSet<>(roles));
+        }
+
+//         user.setRoles(new HashSet<>(roles));
         System.out.println("User trong updateUser UserService: "+ user);
          return userMapper.toUserRespone(userRepository.save(user));
 

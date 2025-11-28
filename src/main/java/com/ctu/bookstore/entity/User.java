@@ -1,7 +1,9 @@
 package com.ctu.bookstore.entity;
 
-//import com.ctu.bookstore.entity.display.Cart;
+import com.ctu.bookstore.entity.display.Cart;
+import com.ctu.bookstore.entity.payment.InforCheckout;
 import com.ctu.bookstore.enums.Gender;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -29,9 +31,16 @@ public class User {
     LocalDate dob;
     String avatar;
     String email;
+    String phoneNumber;
     String adress;
-//    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    Cart cart;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "checkout_id") // tạo cột checkout_id trong bảng user
+    InforCheckout inforCheckout;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    @ToString.Exclude
+    Cart cart;
     @ManyToMany
     Set<Role> roles;
 

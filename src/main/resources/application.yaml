@@ -1,23 +1,40 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT}
   servlet:
-    context-path: /bookstore
+    context-path: ${SERVER_CONTEXT_PATH}
 
 spring:
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+#  data:
+#    mongodb:
+#      uri: ${MONGO_URI}
+#      auto-index-creation: true
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
 
+  # ======================
+  # ELASTICSEARCH CONFIG
+  # ======================
+  elasticsearch:
+    uris: http://localhost:9200
+    connection-timeout: 5s
+    socket-timeout: 30s
+    username:              # để trống vì đã tắt security
+    password:
+
 jwt:
   signerKey: ${JWT_SIGNER_KEY}
 
 cloudinary:
-  cloud-name: ${CLOUD_NAME}
-  api-key: ${CLOUD_API_KEY}
-  api-secret: ${CLOUD_API_SECRET}
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
+
+stripe:
+  apiKey: ${STRIPE_API_KEY}

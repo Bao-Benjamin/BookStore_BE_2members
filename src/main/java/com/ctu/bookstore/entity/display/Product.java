@@ -1,5 +1,6 @@
 package com.ctu.bookstore.entity.display;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,7 +25,12 @@ public class Product {
     Double sellingPrice;
     Double salePrice;
     int quantity;
-
+    String description;
+    String author;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    @JsonIgnore
+    private Category category;
     @OneToMany(
             mappedBy = "product",
             cascade = CascadeType.ALL,

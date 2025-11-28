@@ -33,5 +33,6 @@ public class UserRequest {
     String avatar;
     @Email(message = "EMAIL_INVALID")
     String email;
+    String phoneNumber;
     String adress;
 }

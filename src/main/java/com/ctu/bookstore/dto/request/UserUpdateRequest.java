@@ -31,5 +31,6 @@ public class UserUpdateRequest {
     @Email(message = "EMAIL_INVALID")
     String email;
     String adress;
+    String phoneNumber;
     Set<String> roles;
 }
