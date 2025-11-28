@@ -10,6 +10,7 @@ import com.ctu.bookstore.mapper.display.ProductMapper;
 import com.ctu.bookstore.repository.display.CategoryRepository;
 import com.ctu.bookstore.repository.display.ProductImagesRepository;
 import com.ctu.bookstore.repository.display.ProductRepository;
+import com.ctu.bookstore.repository.display.RatingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +30,7 @@ public class ProductService {
     private final ProductImagesService productImagesService;
     private final ProductRepository productRepository;
     private final ProductSearchService productSearchService;
+    private final RatingRepository ratingRepository;
 
     // -----------------------------------------------------
     // TẠO PRODUCT
@@ -98,6 +100,27 @@ public class ProductService {
 
         return productMapper.toProductResponse(product);
     }
+
+
+    public List<ProductResponse> filterByRating(double minRating) {
+
+        // 1. Lấy danh sách productId có rating trung bình >= minRating
+        List<String> productIds = ratingRepository
+                .findProductIdsWithAvgStarsGreaterOrEqual(minRating);
+
+        if (productIds.isEmpty()) {
+            return List.of(); // không có sản phẩm nào
+        }
+
+        // 2. Lấy danh sách Product từ danh sách ID
+        List<Product> products = productRepository.findAllById(productIds);
+
+        // 3. Convert sang DTO
+        return products.stream()
+                .map(productMapper::toProductResponse)
+                .toList();
+    }
+
 
     // -----------------------------------------------------
     // UPDATE PRODUCT

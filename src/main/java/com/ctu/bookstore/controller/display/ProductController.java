@@ -52,6 +52,15 @@ public class ProductController {
                 .build();
     }
 
+    @GetMapping("/filter-by-rating")
+    public ApiRespone <List<ProductResponse>> filterProductByRating(@RequestParam double rating) {
+        List <ProductResponse> product = productService.filterByRating(rating);
+        return ApiRespone.<List <ProductResponse>>builder()
+                .result(product)
+                .build();
+    }
+
+
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiRespone<ProductResponse> updateProduct(
             @PathVariable String id,
