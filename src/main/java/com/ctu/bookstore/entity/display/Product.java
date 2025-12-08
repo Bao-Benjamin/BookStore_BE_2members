@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +30,7 @@ public class Product {
     int quantity;
     String description;
     String author;
+    Instant createDate;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     @JsonIgnore
@@ -38,6 +42,14 @@ public class Product {
     )
 //    @JsonManagedReference
     Set<ProductImages> imagesUrl = new HashSet<>();
+//    @Builder.Default
+//    @ElementCollection
+//    @CollectionTable(
+//            name = "product_comment_ids",
+//            joinColumns = @JoinColumn(name = "product_id")
+//    )
+//    @Column(name = "comment_id")
+//    List<String> commentId = new ArrayList<>();
 
     // Helper method để quản lý mối quan hệ hai chiều
 
@@ -52,5 +64,6 @@ public class Product {
         this.imagesUrl.add(image);
         image.setProduct(this);
     }
+
 
 }

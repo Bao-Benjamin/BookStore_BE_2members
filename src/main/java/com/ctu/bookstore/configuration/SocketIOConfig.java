@@ -10,7 +10,10 @@ public class SocketIOConfig {
     public SocketIOServer socketIOServer(){
         com.corundumstudio.socketio.Configuration configuration = new com.corundumstudio.socketio.Configuration();
         configuration.setPort(8099);
+        configuration.setHostname("localhost");  // ✅ BẮT BUỘC
+//        configuration.setPort(8080);
         configuration.setOrigin("*"); // có thể connect từ bất cứ đâu
+
 
         return new SocketIOServer(configuration);
     }

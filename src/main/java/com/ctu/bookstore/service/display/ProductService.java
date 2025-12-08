@@ -1,6 +1,7 @@
 package com.ctu.bookstore.service.display;
 
 import com.ctu.bookstore.dto.request.display.ProductRequest;
+import com.ctu.bookstore.dto.respone.display.PageResponse;
 import com.ctu.bookstore.dto.respone.display.ProductResponse;
 import com.ctu.bookstore.entity.display.Category;
 import com.ctu.bookstore.entity.display.Product;
@@ -10,10 +11,15 @@ import com.ctu.bookstore.repository.display.CategoryRepository;
 import com.ctu.bookstore.repository.display.ProductImagesRepository;
 import com.ctu.bookstore.repository.display.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -68,15 +74,22 @@ public class ProductService {
         }
 
 //        product.setImagesUrl(imagesSet);
-
+        product.setCreateDate(Instant.now());
         return productRepository.save(product);
     }
 
-    public List<ProductResponse> findAll() {
-        List<Product> products = productRepository.findAll();
-        return products.stream()
-                .map(productMapper::toProductResponse)
-                .toList();
+    public PageResponse<ProductResponse> findAll(int page, int size) {
+//        List<Product> products = productRepository.findAll();
+        Sort sort = Sort.by("sellingPrice").descending();
+        Pageable pageable = PageRequest.of(page-1,size,sort);
+        var pageData = productRepository.findAll(pageable);
+        return PageResponse.<ProductResponse>builder()
+                .currentPage(page)
+                .pageSize(pageData.getSize())
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent().stream().map(productMapper::toProductResponse).toList())
+                .build();
     }
 
     public ProductResponse findById(String id) {
@@ -151,6 +164,34 @@ public class ProductService {
 
         return productMapper.toProductResponse(updated);
     }
+    public PageResponse<ProductResponse> filterByPrice(
+            Double minPrice,
+            Double maxPrice,
+            int page,
+            int size
+    ) {
+        Sort sort = Sort.by("sellingPrice").ascending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        Page<Product> pageData =
+                productRepository.findBySellingPriceBetween(minPrice, maxPrice, pageable);
+
+        return PageResponse.<ProductResponse>builder()
+                .currentPage(page)
+                .pageSize(pageData.getSize())
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent()
+                        .stream()
+                        .map(productMapper::toProductResponse)
+                        .toList())
+                .build();
+    }
+    public void delete(String  productId){
+        var product = productRepository.findById(productId);
+        productRepository.delete(product.get());
+    }
+
 }
 
 

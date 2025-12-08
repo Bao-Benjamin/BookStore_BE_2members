@@ -1,2 +1,4 @@
-package com.ctu.bookstore.dto.request.chatbot;public class ChatRequest {
+package com.ctu.bookstore.dto.request.chatbot;
+
+public record ChatRequest(String message) {
 }

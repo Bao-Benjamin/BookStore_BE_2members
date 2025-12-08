@@ -7,12 +7,14 @@ import com.ctu.bookstore.dto.respone.chat.ConversationResponse;
 import com.ctu.bookstore.service.chat.ConversationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@Slf4j
 @RequestMapping("/conversations")
 @RequiredArgsConstructor
 public class ConversationController {
@@ -27,6 +29,8 @@ public class ConversationController {
     }
     @PostMapping("/create-default")
     ApiRespone<ConversationResponse> createConversation() {
+//        System.out.println("-----------------");
+        log.info("-------------------");
         return ApiRespone.<ConversationResponse>builder()
                 .result(conversationService.createDefault())
                 .build();

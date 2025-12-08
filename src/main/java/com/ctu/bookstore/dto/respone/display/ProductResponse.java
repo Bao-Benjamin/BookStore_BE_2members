@@ -6,6 +6,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
 @Data
 public class ProductResponse {
@@ -17,7 +19,10 @@ public class ProductResponse {
     int quantity;
     String description;
     String author;
+    Date createDate;
     String categoryName;
     Set<ProductImages> imagesUrl;
+//    List<String> commentId;
+
 
 }

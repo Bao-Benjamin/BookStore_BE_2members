@@ -2,6 +2,7 @@ package com.ctu.bookstore.controller.Display;
 
 import com.ctu.bookstore.dto.request.display.ProductRequest;
 import com.ctu.bookstore.dto.respone.ApiRespone;
+import com.ctu.bookstore.dto.respone.display.PageResponse;
 import com.ctu.bookstore.dto.respone.display.ProductResponse;
 import com.ctu.bookstore.entity.display.Product;
 import com.ctu.bookstore.mapper.display.ProductMapper;
@@ -36,9 +37,12 @@ public class ProductController {
     }
 
     @GetMapping
-    public ApiRespone<List<ProductResponse>> getAllProducts() {
-        List<ProductResponse> products = productService.findAll();
-        return ApiRespone.<List<ProductResponse>>builder()
+    public ApiRespone<PageResponse<ProductResponse>> getAllProducts(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size
+        ){
+        PageResponse<ProductResponse> products = productService.findAll(page, size);
+        return ApiRespone.<PageResponse<ProductResponse>>builder()
                 .result(products)
                 .build();
     }
@@ -62,4 +66,24 @@ public class ProductController {
                 .result(updatedProduct)
                 .build();
     }
+    @GetMapping("/filter-by-price")
+    public ApiRespone<PageResponse<ProductResponse>> filterByPrice(
+            @RequestParam Double minPrice,
+            @RequestParam Double maxPrice,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "6") int size
+
+    ) {
+        PageResponse<ProductResponse> result =
+                productService.filterByPrice(minPrice, maxPrice, page, size);
+
+        return ApiRespone.<PageResponse<ProductResponse>>builder()
+                .result(result)
+                .build();
+    }
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable String id){
+        productService.delete(id);
+    }
+
 }

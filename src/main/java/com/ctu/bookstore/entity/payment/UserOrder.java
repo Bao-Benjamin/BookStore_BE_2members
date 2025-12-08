@@ -34,7 +34,10 @@ public class UserOrder {
     String shippingAddress;
     @Column(columnDefinition = "DATETIME")
     LocalDateTime orderDate;
+    String phoneNumber;
+    String notion;
     String paymentMethod;
+    String voucher;
 
 
 
