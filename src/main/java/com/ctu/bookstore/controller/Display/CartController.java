@@ -53,10 +53,29 @@ public class CartController {
         Cart cart = cartRepository.findByUserId(user.getId()).orElseThrow(()->new RuntimeException("khong có user trong cart controller"));
         cartService.delete(cart.getId());
     }
+    @DeleteMapping("/delete-item/{id}")
+    public void deleteCartItem(@PathVariable("id") String cartItemId){
+       cartService.deleteCartItem(cartItemId);
+    }
     @GetMapping("/size")
     public ApiRespone<Integer> sizeOfCart(){
         return ApiRespone.<Integer>builder()
                 .result(cartService.getSumMyCart())
                 .build();
     }
+    @PutMapping("/increase-item/{id}")
+    public ApiRespone<CartResponse> increase(@PathVariable("id") String productId){
+
+        return ApiRespone.<CartResponse>builder()
+                .result(cartMapper.toCartResponse(cartService.incrementItem(productId)))
+                .build();
+    }
+    @PutMapping("/decrease-item/{id}")
+    public ApiRespone<CartResponse> decrease(@PathVariable("id") String productId ){
+
+        return ApiRespone.<CartResponse>builder()
+                .result(cartMapper.toCartResponse(cartService.decrementItem(productId)))
+                .build();
+    }
+
 }

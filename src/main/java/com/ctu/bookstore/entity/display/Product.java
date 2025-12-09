@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +30,7 @@ public class Product {
     int quantity;
     String description;
     String author;
+    Instant createDate;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     @JsonIgnore
@@ -36,21 +40,17 @@ public class Product {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-//    @JsonManagedReference
+
     Set<ProductImages> imagesUrl = new HashSet<>();
-
-    // Helper method để quản lý mối quan hệ hai chiều
-
-
 
     // Helper method (giữ nguyên để đảm bảo mối quan hệ hai chiều)
     public void addImage(ProductImages image) {
-        // Kiểm tra an toàn, mặc dù đã khởi tạo ở trên, đây là best practice
         if (this.imagesUrl == null) {
             this.imagesUrl = new HashSet<>();
         }
         this.imagesUrl.add(image);
         image.setProduct(this);
     }
+
 
 }

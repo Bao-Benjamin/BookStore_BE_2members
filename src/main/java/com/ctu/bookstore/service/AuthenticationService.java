@@ -30,6 +30,7 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -48,16 +49,22 @@ public class AuthenticationService {
     public IntrospectRespone instrospect(IntrospectRequest request)
             throws JOSEException, ParseException {
        var token = request.getToken();
+        SignedJWT jwt = null; //để lưu sessionId trong socketHandler
 
        boolean isValid = true;
        try {
-           verifyToken(token);
+           jwt = verifyToken(token);
        }catch (Exception e){
            isValid = false;
        }
 
 
        return IntrospectRespone.builder()
+               .userName(
+                       Objects.nonNull(jwt)
+                               ? jwt.getJWTClaimsSet().getSubject()
+                                : null
+                       )
                .valid(isValid)
                .build();
     }

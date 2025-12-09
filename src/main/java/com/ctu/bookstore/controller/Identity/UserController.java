@@ -4,12 +4,18 @@ import com.ctu.bookstore.dto.request.UserUpdateRequest;
 import com.ctu.bookstore.dto.respone.ApiRespone;
 import com.ctu.bookstore.dto.request.UserRequest;
 import com.ctu.bookstore.dto.respone.UserRespone;
+import com.ctu.bookstore.dto.respone.display.ProductResponse;
+import com.ctu.bookstore.dto.respone.payment.UserOrderResponse;
 import com.ctu.bookstore.entity.User;
+import com.ctu.bookstore.entity.display.Product;
 import com.ctu.bookstore.entity.payment.InforCheckout;
 import com.ctu.bookstore.exception.ErrorCode;
 import com.ctu.bookstore.mapper.UserMapper;
+import com.ctu.bookstore.mapper.display.ProductMapper;
+import com.ctu.bookstore.mapper.payment.UserOrderMapper;
 import com.ctu.bookstore.repository.UserRepository;
 import com.ctu.bookstore.service.UserService;
+import com.ctu.bookstore.service.display.CommentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +32,12 @@ public class UserController {
     private UserMapper userMapper;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    UserOrderMapper userOrderMapper;
+    @Autowired
+    CommentService commentService;
+    @Autowired
+    ProductMapper productMapper;
 //    @PostMapping
 //    public ApiRespone<UserRespone> createUser(@RequestBody @Valid UserRequest userRequest){
 //
@@ -72,6 +84,20 @@ public class UserController {
         User user = userRepository.findByUsername(name).orElseThrow(()-> new RuntimeException("Khong tim thay user trong user controller"));
         return ApiRespone.<UserRespone>builder()
                 .result(userService.updateUser(user.getId(),userRequestBody))
+                .build();
+    }
+    @GetMapping("/orders")
+    public ApiRespone<List<UserOrderResponse>> getAllUserOrder(){
+        return ApiRespone.<List<UserOrderResponse>>builder()
+                .result(userService.getAllOrders().stream()
+                        .map(order -> userOrderMapper.toUserOrderResponse(order)).toList())
+                .build();
+    }
+    @GetMapping("/productAllowComment")
+    public ApiRespone<List<ProductResponse>> getProductAllowComment(){
+        return  ApiRespone.<List<ProductResponse>>builder()
+                .result(commentService.getAllProductAllowComment().stream()
+                        .map(product -> productMapper.toProductResponse(product)).toList())
                 .build();
     }
 }

@@ -18,10 +18,11 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserOrderResponse {
+    Long id;
 
-    User user;
+    String userId;
 
-    Set<OrderItem> orderItems = new HashSet<>();
+    Set<OrderItemResponse> orderItems = new HashSet<>();
     String stripeSessionId;
     Double totalAmount;
 
@@ -29,5 +30,8 @@ public class UserOrderResponse {
     String shippingAddress;
 
     LocalDateTime orderDate;
+    String notion;
     String paymentMethod;
+    String voucher;
+
 }
