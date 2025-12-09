@@ -6,6 +6,7 @@ import com.ctu.bookstore.dto.respone.UserRespone;
 import com.ctu.bookstore.entity.User;
 //import com.ctu.bookstore.entity.Role;
 import com.ctu.bookstore.entity.payment.InforCheckout;
+import com.ctu.bookstore.entity.payment.UserOrder;
 import com.ctu.bookstore.enums.Role;
 import com.ctu.bookstore.exception.AppException;
 import com.ctu.bookstore.exception.ErrorCode;
@@ -90,6 +91,7 @@ public class UserService {
         System.out.println("id user trong user service " + user.getId());
         return userMapper.toUserRespone(user);
     }
+
     public InforCheckout getInforCheckout(){
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(name).orElseThrow(()-> new RuntimeException("Không tìm được user trong user service"));
@@ -102,7 +104,6 @@ public class UserService {
         InforCheckout inforCheckout = user.getInforCheckout();
         if (req.getUsername() != null)
             user.setUsername(req.getUsername());
-
 
         if (req.getFirstname() != null)
             user.setFirstname(req.getFirstname());
@@ -152,4 +153,19 @@ public class UserService {
 
 
     }
+    public void updateInforCheckout(InforCheckout inforCheckout){
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        var user = userRepository.findByUsername(name);
+        user.get().setInforCheckout(inforCheckout);
+        userRepository.save(user.get());
+    }
+    public Set<UserOrder> getAllOrders(){
+        var name = SecurityContextHolder.getContext().getAuthentication().getName();
+        var user = userRepository.findByUsername(name);
+        System.out.println("order trong User service: "+ user.get().getUserOrders()
+                .stream().findFirst().get().getOrderItems()
+                .stream().findFirst().get().getProduct().getId());
+        return user.get().getUserOrders();
+    }
+
 }

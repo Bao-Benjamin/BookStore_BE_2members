@@ -1,26 +1,25 @@
 package com.ctu.bookstore.entity.display;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Entity
-@Getter //recommend using @Getter and @Setter cho entity(google for more). One reason is it easy to manage
+@Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Entity
 public class ProductImages {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String url;
-    // 🔥 Phải thêm field này để lưu public_id Cloudinary
-    String publicId;
+    String Url;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id") // Đặt tên cột khóa ngoại trong DB
     @JsonIgnore
-    Product product;
+    private Product product;
 }

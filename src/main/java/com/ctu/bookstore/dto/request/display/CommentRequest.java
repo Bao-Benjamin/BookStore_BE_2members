@@ -1,15 +1,25 @@
 package com.ctu.bookstore.dto.request.display;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommentRequest {
-    String content;      // Có thể null
-    int stars;           // Bắt buộc
-    String productId;    // Liên kết với sản phẩm
+
+    Long orderId;    // Đơn hàng dùng để verify đã mua sản phẩm
+
+    String comment;
+
+    @NotNull
+    @Min(1)
+    @Max(5)
+    Integer rating;
 }

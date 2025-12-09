@@ -1,8 +1,8 @@
 package com.ctu.bookstore.service.display;
 
 import com.ctu.bookstore.dto.request.display.ProductRequest;
+import com.ctu.bookstore.dto.respone.display.PageResponse;
 import com.ctu.bookstore.dto.respone.display.ProductResponse;
-import com.ctu.bookstore.elasticsearch.ProductSearchService;
 import com.ctu.bookstore.entity.display.Category;
 import com.ctu.bookstore.entity.display.Product;
 import com.ctu.bookstore.entity.display.ProductImages;
@@ -10,12 +10,16 @@ import com.ctu.bookstore.mapper.display.ProductMapper;
 import com.ctu.bookstore.repository.display.CategoryRepository;
 import com.ctu.bookstore.repository.display.ProductImagesRepository;
 import com.ctu.bookstore.repository.display.ProductRepository;
-import com.ctu.bookstore.repository.display.RatingRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,19 +28,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
-
     private final ProductMapper productMapper;
     private final CategoryRepository categoryRepository;
     private final ProductImagesService productImagesService;
     private final ProductRepository productRepository;
-    private final ProductSearchService productSearchService;
-    private final RatingRepository ratingRepository;
-
-    // -----------------------------------------------------
-    // TẠO PRODUCT
-    // -----------------------------------------------------
     public Product create(ProductRequest request) throws IOException {
-
         Product product = productMapper.toProduct(request);
 
         if (product.getId() == null) {
@@ -51,17 +47,22 @@ public class ProductService {
 
         if (request.getImages() != null) {
             for (MultipartFile file : request.getImages()) {
-
                 if (!file.isEmpty()) {
                     try {
-                        // Upload lên Cloudinary → trả về entity ProductImages
-                        ProductImages image = productImagesService.uploadImage(file);
+                        // Upload ảnh lên Cloudinary và lấy link
+                        String imageUrl = productImagesService.uploadImage(file);
 
-                        // gắn quan hệ
-                        image.setProduct(product);
+                        // Tạo đối tượng ProductImages và set đủ thông tin
+                        ProductImages image = new ProductImages();
+                        image.setUrl(imageUrl);
+                        // Thiết lập mối quan hệ hai chiều bằng helper method
+//                        product.addImage(image);
 
                         imagesSet.add(image);
-
+//                    image.setProduct(product);
+//
+//                    imagesSet.add(image);
+                        System.out.println("Đã xử lý ảnh Cloudinary: " + imageUrl);
                     } catch (IOException e) {
                         // Xử lý lỗi upload ảnh cụ thể, tránh dừng toàn bộ quá trình
                         System.err.println("Lỗi upload ảnh: " + e.getMessage());
@@ -69,68 +70,39 @@ public class ProductService {
                     }
                 }
             }
-
             product.setImagesUrl(imagesSet);
         }
 
-        product = productRepository.save(product);
-
-        // ❗ Đồng bộ lên Elasticsearch
-        productSearchService.indexProduct(product);
-
-        return product;
+//        product.setImagesUrl(imagesSet);
+        product.setCreateDate(Instant.now());
+        return productRepository.save(product);
     }
 
-    // -----------------------------------------------------
-    // LẤY TẤT CẢ
-    // -----------------------------------------------------
-    public List<ProductResponse> findAll() {
-        return productRepository.findAll()
-                .stream()
-                .map(productMapper::toProductResponse)
-                .toList();
+    public PageResponse<ProductResponse> findAll(int page, int size) {
+//        List<Product> products = productRepository.findAll();
+        Sort sort = Sort.by("sellingPrice").descending();
+        Pageable pageable = PageRequest.of(page-1,size,sort);
+        var pageData = productRepository.findAll(pageable);
+        return PageResponse.<ProductResponse>builder()
+                .currentPage(page)
+                .pageSize(pageData.getSize())
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent().stream().map(productMapper::toProductResponse).toList())
+                .build();
     }
 
-    // -----------------------------------------------------
-    // LẤY THEO ID
-    // -----------------------------------------------------
     public ProductResponse findById(String id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với id: " + id));
 
         return productMapper.toProductResponse(product);
     }
-
-
-    public List<ProductResponse> filterByRating(double minRating) {
-
-        // 1. Lấy danh sách productId có rating trung bình >= minRating
-        List<String> productIds = ratingRepository
-                .findProductIdsWithAvgStarsGreaterOrEqual(minRating);
-
-        if (productIds.isEmpty()) {
-            return List.of(); // không có sản phẩm nào
-        }
-
-        // 2. Lấy danh sách Product từ danh sách ID
-        List<Product> products = productRepository.findAllById(productIds);
-
-        // 3. Convert sang DTO
-        return products.stream()
-                .map(productMapper::toProductResponse)
-                .toList();
-    }
-
-
-    // -----------------------------------------------------
-    // UPDATE PRODUCT
-    // -----------------------------------------------------
     public ProductResponse update(String id, ProductRequest request) throws IOException {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với id: " + id));
 
-        // cập nhật thông tin sản phẩm
         if (request.getNameProduct() != null && !request.getNameProduct().isBlank()) {
             product.setNameProduct(request.getNameProduct());
         }
@@ -153,33 +125,31 @@ public class ProductService {
         if (request.getQuantity() != 0) {
             product.setQuantity(request.getQuantity());
         }
+
         if (request.getCategoryId() != null) {
             Category category = categoryRepository.findById(request.getCategoryId())
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục với id: " + request.getCategoryId()));
             product.setCategory(category);
         }
-
-        // xử lý upload ảnh mới
         if (request.getImages() != null) {
-
-            boolean hasRealImage = request.getImages()
-                    .stream()
-                    .anyMatch(img -> !img.isEmpty());
+            // check xem trong list có file nào không rỗng không
+            boolean hasRealImage = request.getImages().stream().anyMatch(img -> !img.isEmpty());
 
             if (hasRealImage) {
-
-                // Xóa ảnh cũ: xóa Cloudinary + xóa DB
-                for (ProductImages oldImg : product.getImagesUrl()) {
-                    productImagesService.deleteImage(oldImg.getId());
-                }
-
+                // Xóa ảnh cũ và thêm ảnh mới
                 Set<ProductImages> newImages = new HashSet<>();
-
+                Set<ProductImages> productImages = product.getImagesUrl();
+                for(ProductImages oldImage : productImages){
+                    productImagesService.deleteImage(oldImage.getId());
+                }
                 for (MultipartFile file : request.getImages()) {
                     if (!file.isEmpty()) {
-                        ProductImages img = productImagesService.uploadImage(file);
-                        img.setProduct(product);
-                        newImages.add(img);
+                        String imageUrl = productImagesService.uploadImage(file);
+
+                        ProductImages newImg = new ProductImages();
+                        newImg.setUrl(imageUrl);
+                        newImg.setProduct(product);
+                        newImages.add(newImg);
                     }
                 }
 
@@ -188,37 +158,38 @@ public class ProductService {
             }
         }
 
+
         Product updated = productRepository.save(product);
 
-        // ❗ Đồng bộ Elasticsearch
-        productSearchService.indexProduct(updated);
 
         return productMapper.toProductResponse(updated);
     }
+    public PageResponse<ProductResponse> filterByPrice(
+            Double minPrice,
+            Double maxPrice,
+            int page,
+            int size
+    ) {
+        Sort sort = Sort.by("sellingPrice").ascending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-    // -----------------------------------------------------
-    // DELETE PRODUCT
-    // -----------------------------------------------------
-    public void delete(String id) {
+        Page<Product> pageData =
+                productRepository.findBySellingPriceBetween(minPrice, maxPrice, pageable);
 
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với id: " + id));
-
-        // Xóa toàn bộ ảnh liên quan
-        if (product.getImagesUrl() != null) {
-            for (ProductImages img : product.getImagesUrl()) {
-                try {
-                    productImagesService.deleteImage(img.getId());
-                } catch (Exception ignored) {
-                }
-            }
-        }
-
-        // Xóa sản phẩm trong DB
-        productRepository.delete(product);
-
-        // ❗ Xóa trên Elasticsearch
-        productSearchService.deleteProduct(id);
+        return PageResponse.<ProductResponse>builder()
+                .currentPage(page)
+                .pageSize(pageData.getSize())
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent()
+                        .stream()
+                        .map(productMapper::toProductResponse)
+                        .toList())
+                .build();
+    }
+    public void delete(String  productId){
+        var product = productRepository.findById(productId);
+        productRepository.delete(product.get());
     }
 
 }

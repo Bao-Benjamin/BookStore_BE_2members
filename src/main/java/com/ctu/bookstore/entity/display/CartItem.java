@@ -34,7 +34,8 @@ public class CartItem {
     @JsonIgnore
     Cart cart;
 
-    @OneToOne(fetch = FetchType.LAZY)
+//    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="product_id")
     @Fetch(FetchMode.JOIN)
     Product product ;

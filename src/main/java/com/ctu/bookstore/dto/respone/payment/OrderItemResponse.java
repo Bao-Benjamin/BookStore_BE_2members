@@ -1,19 +1,16 @@
 package com.ctu.bookstore.dto.respone.payment;
 
-
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 
-
-@Data
+@Getter
+@Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class OrderItemResponse {
-    String orderId;
-    String productId;
+    Long id;
+    Long productId;
+    String productName;
     int quantity;
     double priceAtTime;
-    boolean ableComment;
 }

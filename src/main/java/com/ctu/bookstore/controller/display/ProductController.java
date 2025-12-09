@@ -2,6 +2,7 @@ package com.ctu.bookstore.controller.display;
 
 import com.ctu.bookstore.dto.request.display.ProductRequest;
 import com.ctu.bookstore.dto.respone.ApiRespone;
+import com.ctu.bookstore.dto.respone.display.PageResponse;
 import com.ctu.bookstore.dto.respone.display.ProductResponse;
 import com.ctu.bookstore.entity.display.Product;
 import com.ctu.bookstore.mapper.display.ProductMapper;
@@ -16,9 +17,8 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/products")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
 public class ProductController {
     @Autowired
     private ProductService productService;
@@ -26,7 +26,7 @@ public class ProductController {
     ProductMapper productMapper ;
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiRespone<ProductResponse> create (@ModelAttribute ProductRequest productRequest
-                                        ) throws IOException {
+    ) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
         Product newProduct = productService.create(productRequest);
@@ -37,9 +37,12 @@ public class ProductController {
     }
 
     @GetMapping
-    public ApiRespone<List<ProductResponse>> getAllProducts() {
-        List<ProductResponse> products = productService.findAll();
-        return ApiRespone.<List<ProductResponse>>builder()
+    public ApiRespone<PageResponse<ProductResponse>> getAllProducts(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size
+    ){
+        PageResponse<ProductResponse> products = productService.findAll(page, size);
+        return ApiRespone.<PageResponse<ProductResponse>>builder()
                 .result(products)
                 .build();
     }
@@ -52,15 +55,6 @@ public class ProductController {
                 .build();
     }
 
-    @GetMapping("/filter-by-rating")
-    public ApiRespone <List<ProductResponse>> filterProductByRating(@RequestParam double rating) {
-        List <ProductResponse> product = productService.filterByRating(rating);
-        return ApiRespone.<List <ProductResponse>>builder()
-                .result(product)
-                .build();
-    }
-
-
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiRespone<ProductResponse> updateProduct(
             @PathVariable String id,
@@ -72,15 +66,24 @@ public class ProductController {
                 .result(updatedProduct)
                 .build();
     }
+    @GetMapping("/filter-by-price")
+    public ApiRespone<PageResponse<ProductResponse>> filterByPrice(
+            @RequestParam Double minPrice,
+            @RequestParam Double maxPrice,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "6") int size
 
-    @DeleteMapping("/{id}")
-    public ApiRespone<String> deleteProduct(@PathVariable String id) {
+    ) {
+        PageResponse<ProductResponse> result =
+                productService.filterByPrice(minPrice, maxPrice, page, size);
 
-        productService.delete(id);
-
-        return ApiRespone.<String>builder()
-                .result("Xóa sản phẩm thành công: " + id)
+        return ApiRespone.<PageResponse<ProductResponse>>builder()
+                .result(result)
                 .build();
+    }
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable String id){
+        productService.delete(id);
     }
 
 }

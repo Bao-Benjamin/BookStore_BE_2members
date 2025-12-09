@@ -1,40 +1,28 @@
 package com.ctu.bookstore.entity.display;
 
 import com.ctu.bookstore.entity.User;
-import jakarta.persistence.*;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.mongodb.core.mapping.MongoId;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 
-@Entity
-@Getter //recommend using @Getter and @Setter cho entity(google for more). One reason is it easy to manage
-@Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Comment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @MongoId
     String id;
 
-    @Column(columnDefinition = "TEXT")
-    String content;
-
-    LocalDateTime createdAt;
-
-    @OneToOne(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    Rating rating;
-
-    // Người bình luận
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    User user;
-
-    // Sản phẩm được bình luận
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    Product product;
-
-
+    String productId;
+    String userId;
+    String username;
+    String comment;
+    Integer rating;        // 1 - 5
+    Instant createdAt;
 }

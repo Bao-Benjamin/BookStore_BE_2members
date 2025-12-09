@@ -4,17 +4,12 @@ import com.ctu.bookstore.entity.display.ProductImages;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductResponse {
     String id;
     String nameProduct;
@@ -24,8 +19,10 @@ public class ProductResponse {
     int quantity;
     String description;
     String author;
+    Date createDate;
     String categoryName;
     Set<ProductImages> imagesUrl;
-    Double averageStars;
-    Set<CommentResponse> comments;
+//    List<String> commentId;
+
+
 }

@@ -10,147 +10,125 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import javax.crypto.spec.SecretKeySpec;
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    private final String[] PUBLIC_ENDPOINTS = {
-            "/users","/user",
-            "/auth/token", "/auth/introspect" ,"/auth/logout",
-            "/api/images/upload", "/api/products",
-            "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"
+    private final String[] PUBLIC_ENDPOINTS = {"/users","/user",
+            "/auth/token", "/auth/introspect" ,"/auth/logout", "/images/upload",
+            "/products","/products/*","checkout/create-session","/carts/my-cart",
+            "/carts/size","user/infor","/api/chat","/bookstore/api/chat","/category"
 
     };
     @Value("${jwt.signerKey}")
     private String signerKey;
-
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
-
-//    @Bean
-//    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity httpSecurity)
-//            throws Exception {
-//        // Áp dụng cấu hình CORS
-//        httpSecurity.cors(Customizer.withDefaults()); // <--- DÒNG QUAN TRỌNG NHẤT
-//        httpSecurity.authorizeHttpRequests(authorize ->
-//                authorize.requestMatchers(HttpMethod.POST,PUBLIC_ENDPOINTS).permitAll()
-//                        .requestMatchers(HttpMethod.GET,PUBLIC_ENDPOINTS).permitAll()
-////                        .requestMatchers(HttpMethod.GET, "/user").hasRole(Role.ADMIN.name())
-//                        .requestMatchers(
-//                                "/v3/api-docs/**",
-//                                "/swagger-ui/**",
-//                                "/swagger-ui.html"
-//                        ).permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/images/upload", "/products", "/api/comments").permitAll()
-//                        .anyRequest().authenticated());
-//
-//        httpSecurity.csrf(csrf -> csrf.disable());
-//
-//        httpSecurity.oauth2ResourceServer(oauth2 ->
-//                oauth2.jwt(jwtConfigurer -> jwtConfigurer
-//                        .decoder(customJwtDecoder)
-//                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-//                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-//        );
-//
-//        return httpSecurity.build();
-//    }
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity httpSecurity)
+            throws Exception {
+        // Áp dụng cấu hình CORS
+        httpSecurity.cors(Customizer.withDefaults()); // <--- DÒNG QUAN TRỌNG NHẤT
+        httpSecurity.authorizeHttpRequests(authorize ->
+                authorize.requestMatchers(HttpMethod.POST,PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET,PUBLIC_ENDPOINTS).permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/user").hasRole(Role.ADMIN.name())
+                        .requestMatchers(
+//                                "/bookstore/v3/api-docs/**","/bookstore/v3/api-docs",
+//                                "/v3/api-docs",
+//                                "/v3/api-docs/**",
+//                                "/bookstore/swagger-ui/**",
+//                                "/bookstore/swagger-ui.html",
+//                                "/swagger-ui.html"
+                                "/bookstore/swagger-ui/**",
+                                "/bookstore/swagger-ui.html",
+                                "/bookstore/v3/api-docs/**",
+                                "/bookstore/v3/api-docs",
+                                "/bookstore/v3/api-docs/swagger-config",
 
-        http.cors(Customizer.withDefaults());
-        http.csrf(csrf -> csrf.disable());
+                                // fallback no context-path
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs",
+                                "/v3/api-docs/swagger-config",
 
-        http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS).permitAll()
+                                // static swagger resources
+                                "/swagger-ui/index.html",
+                                "/swagger-ui/swagger-ui.css",
+                                "/swagger-ui/swagger-ui-bundle.js",
+                                "/swagger-ui/swagger-ui-standalone-preset.js"
+                        ).permitAll()
+                        .requestMatchers(HttpMethod.POST, "/images/upload", "/products",
+                                "checkout/create-session","carts/item","/conversations/create",
+                                "/conversation/my-conversations","/messages/create","/messages/*",
+                                "/conversations/create-default","/chat","/api/chat","/bookstore/api/chat").permitAll()
+                        .anyRequest().authenticated());
 
-                // SWAGGER
-                .requestMatchers(
-                        "/bookstore/swagger-ui/**",
-                        "/bookstore/swagger-ui.html",
-                        "/bookstore/v3/api-docs/**",
-                        "/bookstore/v3/api-docs",
-                        "/bookstore/v3/api-docs/swagger-config",
-                        "/swagger-ui/**",
-                        "/swagger-ui.html",
-                        "/v3/api-docs/**",
-                        "/v3/api-docs",
-                        "/v3/api-docs/swagger-config",
-                        "/swagger-ui/index.html",
-                        "/swagger-ui/swagger-ui.css",
-                        "/swagger-ui/swagger-ui-bundle.js",
-                        "/swagger-ui/swagger-ui-standalone-preset.js"
-                ).permitAll()
+        httpSecurity.csrf(csrf -> csrf.disable());
 
-                .requestMatchers(HttpMethod.POST,
-                        "/images/upload", "/products",
-                        "checkout/create-session", "carts/item",
-                        "/conversations/create", "/conversation/my-conversations",
-                        "/messages/create", "/messages/*",
-                        "/conversations/create-default"
-                ).permitAll()
-
-                .anyRequest().authenticated()
+        httpSecurity.oauth2ResourceServer(oauth2 ->
+                oauth2.jwt(jwtConfigurer -> jwtConfigurer
+                                .decoder(customJwtDecoder)
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
         );
 
-        http.oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(jwt -> jwt
-                        .decoder(customJwtDecoder)
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-        );
+        return httpSecurity.build();
 
-        return http.build();
+
+
     }
-
-
-    // Cho phép CORS từ các origin cần thiết
+    // Bean để cấu hình CORS
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:3000",  // Vite
-                "http://127.0.0.1:5500"   // Live Server
-        ));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setExposedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
-    private JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
-        converter.setAuthorityPrefix(""); // bỏ prefix ROLE_
 
-        JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
-        jwtConverter.setJwtGrantedAuthoritiesConverter(converter);
-        return jwtConverter;
+    JwtAuthenticationConverter jwtAuthenticationConverter (){
+        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
     }
+//    @Bean
+//    JwtDecoder jwtDecoder(){
+//        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
+//        return NimbusJwtDecoder
+//                .withSecretKey(secretKeySpec)
+//                .macAlgorithm(MacAlgorithm.HS512)
+//                .build();
+//    }
+
 
     @Bean
     PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder(10);
     }
-    }
-
-
-
-
+}

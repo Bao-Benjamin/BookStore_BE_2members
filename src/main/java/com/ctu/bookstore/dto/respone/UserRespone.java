@@ -1,5 +1,6 @@
 package com.ctu.bookstore.dto.respone;
 
+import com.ctu.bookstore.dto.respone.payment.UserOrderResponse;
 import com.ctu.bookstore.enums.Gender;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -29,4 +30,5 @@ public class UserRespone {
     String email;
     String adress;
     Set<RoleRespone> roles;
+    Set<UserOrderResponse> userOrderResponses;
 }

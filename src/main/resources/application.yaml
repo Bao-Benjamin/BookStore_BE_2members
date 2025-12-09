@@ -3,6 +3,13 @@ server:
   servlet:
     context-path: ${SERVER_CONTEXT_PATH}
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    url: /v3/api-docs
+
 spring:
   datasource:
     url: ${DB_URL}
@@ -13,11 +20,6 @@ spring:
       uri: ${MONGO_URI}
       auto-index-creation: true
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-
   # ======================
   # ELASTICSEARCH CONFIG
   # ======================
@@ -27,6 +29,11 @@ spring:
     socket-timeout: 30s
     username:              # để trống vì đã tắt security
     password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
 
 jwt:
   signerKey: ${JWT_SIGNER_KEY}

@@ -2,6 +2,7 @@ package com.ctu.bookstore.entity;
 
 import com.ctu.bookstore.entity.display.Cart;
 import com.ctu.bookstore.entity.payment.InforCheckout;
+import com.ctu.bookstore.entity.payment.UserOrder;
 import com.ctu.bookstore.enums.Gender;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -9,6 +10,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -36,7 +38,10 @@ public class User {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "checkout_id") // tạo cột checkout_id trong bảng user
     InforCheckout inforCheckout;
-
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @JsonIgnore
+    Set<UserOrder> userOrders = new HashSet<>();
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     @ToString.Exclude
