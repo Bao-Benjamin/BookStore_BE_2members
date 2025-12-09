@@ -1,4 +1,4 @@
-package com.ctu.bookstore.controller.Display;
+package com.ctu.bookstore.controller.display;
 
 import com.ctu.bookstore.dto.request.display.CategoryRequest;
 import com.ctu.bookstore.dto.respone.display.CategoryRespone;
