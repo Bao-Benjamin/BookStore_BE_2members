@@ -6,6 +6,7 @@ import com.ctu.bookstore.dto.respone.UserRespone;
 import com.ctu.bookstore.entity.User;
 //import com.ctu.bookstore.entity.Role;
 import com.ctu.bookstore.entity.payment.InforCheckout;
+import com.ctu.bookstore.entity.payment.UserOrder;
 import com.ctu.bookstore.enums.Role;
 import com.ctu.bookstore.exception.AppException;
 import com.ctu.bookstore.exception.ErrorCode;
@@ -158,4 +159,13 @@ public class UserService {
         user.get().setInforCheckout(inforCheckout);
         userRepository.save(user.get());
     }
+    public Set<UserOrder> getAllOrders(){
+        var name = SecurityContextHolder.getContext().getAuthentication().getName();
+        var user = userRepository.findByUsername(name);
+        System.out.println("order trong User service: "+ user.get().getUserOrders()
+                .stream().findFirst().get().getOrderItems()
+                .stream().findFirst().get().getProduct().getId());
+        return user.get().getUserOrders();
+    }
+
 }

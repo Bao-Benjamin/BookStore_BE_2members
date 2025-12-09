@@ -4,6 +4,7 @@ import com.ctu.bookstore.dto.request.display.CommentRequest;
 import com.ctu.bookstore.dto.respone.display.CommentResponse;
 import com.ctu.bookstore.entity.User;
 import com.ctu.bookstore.entity.display.Comment;
+import com.ctu.bookstore.entity.display.Product;
 import com.ctu.bookstore.entity.payment.UserOrder;
 import com.ctu.bookstore.enums.OrderStatus;
 import com.ctu.bookstore.mapper.display.CommentMapper;
@@ -11,6 +12,7 @@ import com.ctu.bookstore.repository.UserRepository;
 import com.ctu.bookstore.repository.display.CommentRepository;
 import com.ctu.bookstore.repository.display.ProductRepository;
 import com.ctu.bookstore.repository.payment.UserOrderRepository;
+import com.ctu.bookstore.service.UserService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +36,7 @@ public class CommentService {
     ProductRepository productRepository; // bạn đã có sẵn
     UserRepository userRepository;       // bạn đã có sẵn (nếu cần lấy username)
     CommentMapper commentMapper;
+    UserService userService;
     @Transactional
     public CommentResponse createComment(String productId, CommentRequest request) {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -68,6 +73,28 @@ public class CommentService {
 
     public List<Comment> getCommentOfProduct(String productId){
         return commentRepository.findByProductIdOrderByCreatedAtDesc(productId);
+    }
+    public Set<Product> getAllProductAllowComment(){
+        Set<Product> products = new HashSet<>();
+
+        Set<UserOrder> orders = userService.getAllOrders();
+        if (orders == null || orders.isEmpty()) {
+            return products; // trả list rỗng
+        }
+
+        orders.forEach(userOrder -> {
+            if(userOrder.getStatus() == OrderStatus.PAID) {
+                if (userOrder.getOrderItems() != null) {
+                    userOrder.getOrderItems().forEach(item -> {
+                        if (item.getProduct() != null) {
+                            products.add(item.getProduct());
+                        }
+                    });
+                }
+            }
+        });
+
+        return products;
     }
 
 
