@@ -13,14 +13,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Entity
-@Getter //recommend using @Getter and @Setter cho entity(google for more). One reason is it easy to manage
+@Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
+@Entity
 public class Product {
     @Id
     String id;
@@ -54,11 +53,6 @@ public class Product {
 
     // Helper method để quản lý mối quan hệ hai chiều
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    Set<Comment> comments;
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    Set<Rating> ratings;
 
 
     // Helper method (giữ nguyên để đảm bảo mối quan hệ hai chiều)

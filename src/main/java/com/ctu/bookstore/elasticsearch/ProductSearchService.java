@@ -15,20 +15,11 @@ public class ProductSearchService {
     // Đồng bộ 1 sản phẩm vào Elasticsearch
     public void indexProduct(Product product) {
 
-        Double averageStars = 0.0;
-        if (product.getRatings() != null && !product.getRatings().isEmpty()) {
-            averageStars = product.getRatings()
-                    .stream()
-                    .mapToInt(r -> r.getStars())
-                    .average()
-                    .orElse(0.0);
-        }
 
         ProductDocument doc = ProductDocument.builder()
                 .id(product.getId())
                 .nameProduct(product.getNameProduct())
                 .sellingPrice(product.getSellingPrice())
-                .averageStars(averageStars)
                 .build();
 
         searchRepository.save(doc);
