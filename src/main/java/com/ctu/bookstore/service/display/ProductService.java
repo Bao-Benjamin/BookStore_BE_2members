@@ -228,6 +228,86 @@ public Product create(ProductRequest request) throws IOException {
         var product = productRepository.findById(productId);
         productRepository.delete(product.get());
     }
+    public PageResponse<ProductResponse> filterByCategory(
+            String categoryId,
+            int page,
+            int size
+    ) {
+        // (Optional) Kiểm tra category có tồn tại không
+        categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục với id: " + categoryId));
+
+        Sort sort = Sort.by("sellingPrice").descending(); // hoặc theo createDate tùy bạn
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        Page<Product> pageData = productRepository.findByCategory_Id(categoryId, pageable);
+
+        return PageResponse.<ProductResponse>builder()
+                .currentPage(page)
+                .pageSize(pageData.getSize())
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent()
+                        .stream()
+                        .map(productMapper::toProductResponse)
+                        .toList())
+                .build();
+    }
+
+
+    // ⭐ Lọc theo rating (cho phép khoảng min-max)
+    public PageResponse<ProductResponse> filterByRating(
+            Double minStars,
+            Double maxStars,
+            int page,
+            int size
+    ) {
+        if (minStars == null) minStars = 0.0;
+        if (maxStars == null) maxStars = 5.0;
+
+        Sort sort = Sort.by("averageStars").descending(); // ưu tiên sản phẩm sao cao
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        Page<Product> pageData =
+                productRepository.findByAverageStarsBetween(minStars, maxStars, pageable);
+
+        return PageResponse.<ProductResponse>builder()
+                .currentPage(page)
+                .pageSize(pageData.getSize())
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent()
+                        .stream()
+                        .map(productMapper::toProductResponse)
+                        .toList())
+                .build();
+    }
+
+    // Nếu bạn thích kiểu ">= X sao" thay vì min-max:
+    public PageResponse<ProductResponse> filterByMinRating(
+            Double minStars,
+            int page,
+            int size
+    ) {
+        if (minStars == null) minStars = 0.0;
+
+        Sort sort = Sort.by("averageStars").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        Page<Product> pageData =
+                productRepository.findByAverageStarsGreaterThanEqual(minStars, pageable);
+
+        return PageResponse.<ProductResponse>builder()
+                .currentPage(page)
+                .pageSize(pageData.getSize())
+                .totalPages(pageData.getTotalPages())
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent()
+                        .stream()
+                        .map(productMapper::toProductResponse)
+                        .toList())
+                .build();
+    }
 
 }
 

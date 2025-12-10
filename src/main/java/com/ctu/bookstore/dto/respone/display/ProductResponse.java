@@ -21,6 +21,9 @@ public class ProductResponse {
     String author;
     Date createDate;
     String categoryName;
+
+    Double averageStars;    // trung bình sao (1-5)
+    Integer ratingCount;    // tổng số lượt rating
     Set<ProductImages> imagesUrl;
 //    List<String> commentId;
 

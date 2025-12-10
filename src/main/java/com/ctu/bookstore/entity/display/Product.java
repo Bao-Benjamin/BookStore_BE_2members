@@ -31,6 +31,9 @@ public class Product {
     String description;
     String author;
     Instant createDate;
+    // ⭐ thêm 2 field này
+    Double averageStars;    // trung bình sao (1-5)
+    Integer ratingCount;    // tổng số lượt rating
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     @JsonIgnore

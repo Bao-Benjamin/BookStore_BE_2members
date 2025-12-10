@@ -14,4 +14,15 @@ Page<Product> findBySellingPriceBetween(
         Double maxPrice,
         Pageable pageable
 );
+    Page<Product> findByCategory_Id(String categoryId, Pageable pageable);
+    // ⭐ filter theo rating
+    Page<Product> findByAverageStarsBetween(
+            Double minStars,
+            Double maxStars,
+            Pageable pageable
+    );
+    Page<Product> findByAverageStarsGreaterThanEqual(
+            Double minStars,
+            Pageable pageable
+    );
 }

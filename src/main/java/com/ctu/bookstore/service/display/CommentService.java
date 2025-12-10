@@ -67,7 +67,17 @@ public class CommentService {
 //        product.getCommentId().add(savedComment.getId());
 //        var prod = productRepository.save(product); // lưu lại product
 //        System.out.println("product commentid trong comment service "+ prod.getCommentId());
+        // ⭐ Cập nhật rating cho Product
+        Integer oldCount = product.getRatingCount() == null ? 0 : product.getRatingCount();
+        Double oldAvg   = product.getAverageStars() == null ? 0.0 : product.getAverageStars();
 
+        int newCount = oldCount + 1;
+        double newAvg = ((oldAvg * oldCount) + request.getRating()) / newCount;
+
+        product.setRatingCount(newCount);
+        product.setAverageStars(newAvg);
+
+        productRepository.save(product);
         return commentMapper.toCommentResponse(savedComment);
     }
 
