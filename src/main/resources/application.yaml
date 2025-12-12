@@ -12,9 +12,9 @@ springdoc:
 
 spring:
   datasource:
-    url: ${mysql_url}
+    url: jdbc:mysql://root:CKvPJZEVTbBDegidMImXTFLUoAcCmRKv@mysql.railway.internal:3306/railway
     username: root
-    password: ${mysql_password}
+    password: CKvPJZEVTbBDegidMImXTFLUoAcCmRKv
 
   data:
     mongodb:
@@ -35,11 +35,11 @@ jwt:
 
 cloudinary:
   cloud-name: dfinfmcan
-  api-key:${CLOUDINARY_KEY}
-  api-secret:${CLOUDINARY_SECRET} 
+  api-key: ${CLOUDINARY_KEY}
+  api-secret: ${CLOUDINARY_SECRET} 
 
 stripe:
-  apiKey:${STRIPE_KEY}
+  apiKey: ${STRIPE_KEY}
 openai:
   api:
     key: ${OPENAI_API_KEY}
