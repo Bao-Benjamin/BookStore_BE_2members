@@ -12,13 +12,13 @@ springdoc:
 
 spring:
   datasource:
-    url: "jdbc:mysql://localhost:3306/bookstore_mysql"
-    username:
-    password:
+    url: ${mysql_url}
+    username: root
+    password: ${mysql_password}
 
   data:
     mongodb:
-      uri:
+      uri: ${mongoDB_uri}
       auto-index-creation: true
 
   jpa:
@@ -31,7 +31,7 @@ spring:
       api-key: ${OPENAI_API_KEY}
 
 jwt:
-  signerKey:
+  signerKey:${signer_key}
 
 cloudinary:
   cloud-name: dfinfmcan
