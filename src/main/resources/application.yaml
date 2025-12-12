@@ -16,11 +16,17 @@ spring:
     username: "${mysql_username}"
     password: "${mysql_password}"
     driver-class-name: com.mysql.cj.jdbc.Driver
-  spring:
-    autoconfigure:
-       exclude: org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchAutoConfiguration
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchAutoConfiguration
+      - org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration
 
   data:
+    elasticsearch:
+      repositories:
+        enabled: false
     mongodb:
       uri: "${mongoDB_uri}"
       auto-index-creation: true
@@ -44,6 +50,7 @@ cloudinary:
 
 stripe:
   apiKey: ${STRIPE_KEY}
+
 openai:
   api:
     key: ${OPENAI_API_KEY}
