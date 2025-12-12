@@ -35,11 +35,11 @@ jwt:
 
 cloudinary:
   cloud-name: dfinfmcan
-  api-key:
-  api-secret: t
+  api-key:${CLOUDINARY_KEY}
+  api-secret:${CLOUDINARY_SECRET} 
 
 stripe:
-  apiKey:
+  apiKey:${STRIPE_KEY}
 openai:
   api:
     key: ${OPENAI_API_KEY}
