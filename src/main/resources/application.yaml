@@ -12,13 +12,14 @@ springdoc:
 
 spring:
   datasource:
-    url: jdbc:mysql://root:CKvPJZEVTbBDegidMImXTFLUoAcCmRKv@mysql.railway.internal:3306/railway
-    username: root
-    password: CKvPJZEVTbBDegidMImXTFLUoAcCmRKv
+    url: "${mysql_url}"
+    username: "${mysql_username}"
+    password: "${mysql_password}"
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   data:
     mongodb:
-      uri: ${mongoDB_uri}
+      uri: "${mongoDB_uri}"
       auto-index-creation: true
 
   jpa:
@@ -31,7 +32,7 @@ spring:
       api-key: ${OPENAI_API_KEY}
 
 jwt:
-  signerKey:${signer_key}
+  signerKey: "${signer_key}"
 
 cloudinary:
   cloud-name: dfinfmcan
