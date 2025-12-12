@@ -16,6 +16,9 @@ spring:
     username: "${mysql_username}"
     password: "${mysql_password}"
     driver-class-name: com.mysql.cj.jdbc.Driver
+  spring:
+    autoconfigure:
+       exclude: org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchAutoConfiguration
 
   data:
     mongodb:
